@@ -89,32 +89,24 @@ public class LoginWindow extends JFrame implements ActionListener
 
 	public void actionPerformed(ActionEvent ae) 
 	{
-		if(ae.getSource() == login || ae.getSource() == passIn)
-		{
+		if(ae.getSource() == login || ae.getSource() == passIn){
 			LoginCode();
-		}
-		else if(ae.getSource() == showPass)
-		{
-			if(sh == 0)
-			{
+		}else if(ae.getSource() == showPass){
+			if(sh == 0){
 				passIn.setEchoChar((char)0);
 				sh = 1;
 				showPass.setText("Hide Password");
-			}
-			else
-			{
+			}else{
 				passIn.setEchoChar('*');
 				sh = 0;
 				showPass.setText("Show Password");
 			}
-		}
-		else if(ae.getSource() == register){
+		}else if(ae.getSource() == register){
 			RegisterNew.CreateGUI();
 		}
 	}
 	
-	public static void LoginCode()
-	{
+	public static void LoginCode(){
 		String terms = "This is a placeholder item for this program's" + '\n' +
 				"Terms and Conditions." + '\n' +
 				"" + '\n' +
@@ -123,92 +115,39 @@ public class LoginWindow extends JFrame implements ActionListener
 		String usr = userIn.getText();
 		String password = "";
 		char[] pass = passIn.getPassword();
-		for(int count = 0; count < pass.length; count++)
-		{
+		for(int count = 0; count < pass.length; count++){
 			password += pass[count];
 		}
 
 		String passSHA = CmnCode.HashBash(password);
 		String username = "";
-		if(usr.equalsIgnoreCase("root") && passSHA.equalsIgnoreCase(CmnCode.HashBash("halorvb1")))
-		{
+		if(usr.equalsIgnoreCase("root") && passSHA.equalsIgnoreCase(CmnCode.HashBash("halorvb1"))){
 			JOptionPane.showMessageDialog(null, "Welcome! You are \nlogged in as ROOT.");
 			//AdminWindow.CreateGUI("root"); TODO
-		}
-		
-		else
-		{
-			try
-			{
+		}else{
+			try{
 				Class.forName("com.mysql.jdbc.Driver").newInstance();
 				String connStr = MysqlStuff.conn();
 				conn = DriverManager.getConnection(connStr + MysqlStuff.loginAero());
 				
-				pst = conn.prepareStatement("Select * from user_login where username = ? and pass = ?");
+				pst = conn.prepareStatement("Select * from users where username = ? and usr_pass = ?");
 				pst.setString(1, usr);
 				pst.setString(2, passSHA);
 				ResultSet rs = pst.executeQuery();
 	
-				
-				if(rs.next())
-				{
-					String adminLVL = rs.getString("account_status");
+				if(rs.next()){
+					
 					String userIDNum = rs.getString("user_id");
-					int admin = Integer.parseInt(adminLVL);
 					username = rs.getString("name_first") + " " + rs.getString("name_last");
-					String regnum = rs.getString("regnum");
-					if(regnum.length() < 1)
-					{
-						JOptionPane.showMessageDialog(null, "You are not a registered user. Please visit" + '\n' + 
-								"the registration page to purchase a liscense.");
-					}
-					else
-					{
-						boolean checkreg = CleanRegNum(usr, regnum);
-						if(checkreg)
-						{
-							frame.setVisible(false);
-							if(admin == 5)
-							{
-								int login = JOptionPane.showConfirmDialog(null, terms, "Terms and Conditions", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
-								if(login == 0)
-								{
-									JOptionPane.showMessageDialog(null, "Welcome " + username + "! You are \nlogged in as an admin.");
-									//AdminWindow.CreateGUI(userIDNum); TODO
-								}
-								else
-								{
-									CreateGUI();
-								}
-							}
-							else
-							{
-								int login = JOptionPane.showConfirmDialog(null, terms, "Terms and Conditions", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
-								if(login == 0)
-								{
-									JOptionPane.showMessageDialog(null, "Welcome " + username + "!");
-									//MainWindow.CreateGUI(userIDNum); TODO
-								}
-								else
-								{
-									CreateGUI();
-								}
-							}
-						}
-						else
-						{
-							JOptionPane.showMessageDialog(null, "You are not a liscensed user. Please visit" + '\n' + 
-									"the registration page to purchase a liscense.");
-						}
-					}
-				}
-				else
-				{
+					
+					frame.dispose();	
+					JOptionPane.showMessageDialog(null, "Welcome " + username + "!");
+					//MainWindow.CreateGUI(); TODO
+									
+				}else{
 					JOptionPane.showMessageDialog(null, "Login failed, please try again.");
 				}
-			}
-			catch(Exception e)
-			{
+			}catch(Exception e){
 				JOptionPane.showMessageDialog(null, e);
 			}
 		}
