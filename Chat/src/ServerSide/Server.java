@@ -1,4 +1,4 @@
-package Comms;
+package ServerSide;
 
 import java.io.*;
 import java.net.*;

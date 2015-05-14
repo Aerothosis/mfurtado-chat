@@ -1,4 +1,4 @@
-package Comms;
+package ServerSide;
 
 import javax.swing.JFrame;
 
